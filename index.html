@@ -296,31 +296,84 @@ h2 {
         <p id="errorMessage" class="error-message"></p>
 
         <div class="result-section">
-            <h2>調剤量（小数点第1位・偶数丸め）</h2>
 
-            <div class="output-group">
-                <p class="output-label" id="drugVolumeLabel">必要な溶質:</p>
-                <p id="drugVolumeMl" class="output-value main-result">-- mL</p>
+            <!-- 通常薬剤用 -->
+            <div id="standardResultArea">
+                <h2>調剤量（小数点第1位・偶数丸め）</h2>
+
+                <div class="output-group">
+                    <p class="output-label" id="drugVolumeLabel">必要な溶質:</p>
+                    <p id="drugVolumeMl" class="output-value main-result">-- mL</p>
+                </div>
+
+                <div class="output-group">
+                    <p class="output-label">必要な溶媒:</p>
+                    <p id="diluentVolumeMl" class="output-value main-result">-- mL</p>
+                </div>
+
+                <hr>
+
+                <h2>品質確認（1 mL/hr投与時）</h2>
+
+                <div class="output-group secondary">
+                    <p class="output-label">実際の投与速度:</p>
+                    <p id="trueDoseOutput" class="output-value">--</p>
+                </div>
+
+                <div class="output-group secondary">
+                    <p class="output-label">目標からの誤差:</p>
+                    <p id="errorRateOutput" class="output-value">-- %</p>
+                </div>
             </div>
 
-            <div class="output-group">
-                <p class="output-label">必要な溶媒:</p>
-                <p id="diluentVolumeMl" class="output-value main-result">-- mL</p>
+            <!-- ニカルジピン末梢静脈路用 -->
+            <div id="nicardipinePeriphResultArea" style="display:none">
+                <h2>調剤法（総量50mL固定）</h2>
+
+                <div class="output-group">
+                    <p class="output-label">0.1mg/mL希釈:</p>
+                    <p class="output-value main-result">原液 5.0 mL ＋ 溶媒 45.0 mL</p>
+                </div>
+
+                <div class="output-group">
+                    <p class="output-label">0.2mg/mL希釈:</p>
+                    <p class="output-value main-result">原液 10.0 mL ＋ 溶媒 40.0 mL</p>
+                </div>
+
+                <hr>
+
+                <h2>流速（0.5μg/kg/min投与時）</h2>
+
+                <div class="output-group secondary">
+                    <p class="output-label">0.1mg/mL使用時:</p>
+                    <p id="nicardipinePeriphFlow01" class="output-value">-- mL/hr</p>
+                </div>
+
+                <div class="output-group secondary">
+                    <p class="output-label">0.2mg/mL使用時:</p>
+                    <p id="nicardipinePeriphFlow02" class="output-value">-- mL/hr</p>
+                </div>
             </div>
 
-            <hr>
+            <!-- ニカルジピン中心静脈用 -->
+            <div id="nicardipineCentralResultArea" style="display:none">
+                <h2>調剤法（2倍希釈）</h2>
 
-            <h2>品質確認（1 mL/hr投与時）</h2>
+                <div class="output-group">
+                    <p class="output-label">調製方法:</p>
+                    <p class="output-value main-result">原液 1 : 溶媒 1 で混合（0.5mg/mL）</p>
+                </div>
 
-            <div class="output-group secondary">
-                <p class="output-label">実際の投与速度:</p>
-                <p id="trueDoseOutput" class="output-value">--</p>
+                <hr>
+
+                <h2>流速（0.5μg/kg/min投与時）</h2>
+
+                <div class="output-group secondary">
+                    <p class="output-label">2倍希釈(0.5mg/mL)使用時:</p>
+                    <p id="nicardipineCentralFlow" class="output-value">-- mL/hr</p>
+                </div>
             </div>
 
-            <div class="output-group secondary">
-                <p class="output-label">目標からの誤差:</p>
-                <p id="errorRateOutput" class="output-value">-- %</p>
-            </div>
         </div>
 
         <div class="reference-section">
@@ -344,7 +397,8 @@ const DRUG_DATA = [
     { category: '心血管作動薬', name: 'ノルアドレナリン1mg/mL', code: 'Noradrenaline', conc_mg_mL: 1.0, target_dose: 0.05, target_unit: 'ug/kg/min', start_dose: 0.05, min_dose: 0.01, max_dose: 1.0 },
     { category: '心血管作動薬', name: 'アドレナリン1mg/mL', code: 'Adrenaline', conc_mg_mL: 1.0, target_dose: 0.05, target_unit: 'ug/kg/min', start_dose: 0.05, min_dose: 0.01, max_dose: 0.1 },
     { category: '心血管作動薬', name: 'ミルリノン10mg/10mL', code: 'Millinon', conc_mg_mL: 1.0, target_dose: 0.5, target_unit: 'ug/kg/min', start_dose: 0.5, min_dose: 0.25, max_dose: 1.0 },
-    { category: '心血管作動薬', name: 'ニカルジピン', code: 'Nicardipine', conc_mg_mL: 1.0, target_dose: 1.0, target_unit: 'ug/kg/min', start_dose: 1.0, min_dose: 0.5, max_dose: 2.0 },
+    { category: '心血管作動薬', name: 'ニカルジピン(1mg/mL) 末梢静脈用', code: 'NicardipinePeriph', conc_mg_mL: 1.0, target_dose: 0.5, target_unit: 'ug/kg/min', start_dose: 0.5, min_dose: 0.5, max_dose: 2.0, special_type: 'nicardipine_peripheral' },
+    { category: '心血管作動薬', name: 'ニカルジピン(1mg/mL) 中心静脈用', code: 'NicardipineCentral', conc_mg_mL: 1.0, target_dose: 0.5, target_unit: 'ug/kg/min', start_dose: 0.5, min_dose: 0.5, max_dose: 2.0, special_type: 'nicardipine_central' },
     { category: '心血管作動薬', name: 'アルプロスタジルアルファデックス(PGE1-CD)', code: 'PGE1CD', conc_mg_mL: 0.02, target_dose: 50.0, target_unit: 'ng/kg/min', start_dose: 50.0, min_dose: 10.0, max_dose: 200.0, stock_note: '1Vを生食 1mL で溶解' },
     { category: '心血管作動薬', name: 'パルクス(Lipo-PGE1)', code: 'LipoPGE1', conc_mg_mL: 0.005, target_dose: 5.0, target_unit: 'ng/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
     { category: '心血管作動薬', name: 'ピトレシン20U', code: 'Vasopresin', conc_mg_mL: 20.0, target_dose: 0.4, target_unit: 'mU/kg/min', start_dose: 0.4, min_dose: 0.2, max_dose: 1.0 },
@@ -422,8 +476,12 @@ function populateDrugSelect() {
     filteredDrugs.forEach(drug => {
         const option = document.createElement('option');
         option.value = drug.code;
-        const concUnit = drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL';
-        option.textContent = `${drug.name} (${drug.conc_mg_mL} ${concUnit})`;
+        if (drug.special_type) {
+            option.textContent = drug.name;
+        } else {
+            const concUnit = drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL';
+            option.textContent = `${drug.name} (${drug.conc_mg_mL} ${concUnit})`;
+        }
         drugSelect.appendChild(option);
     });
 
@@ -444,6 +502,15 @@ function updateFixedDoseDisplay() {
     const drug = DRUG_DATA.find(d => d.code === selectedCode);
 
     if (drug) {
+        if (drug.special_type === 'nicardipine_peripheral') {
+            displayElement.innerHTML = `末梢静脈路 / 総量: <strong>50mL固定</strong> / 希釈濃度: <strong>0.1〜0.2mg/mL</strong> / 目標: <strong>0.5μg/kg/min</strong>`;
+            return;
+        }
+        if (drug.special_type === 'nicardipine_central') {
+            displayElement.innerHTML = `中心静脈路 / 2倍希釈 (<strong>0.5mg/mL</strong>) / 目標: <strong>0.5μg/kg/min</strong>`;
+            return;
+        }
+
         let doseRange = '';
         if (drug.min_dose !== undefined && drug.max_dose !== undefined) {
             doseRange = ` (${drug.min_dose}〜${drug.max_dose} ${drug.target_unit})`;
@@ -476,36 +543,30 @@ function roundToEvenFirstDecimal(value) {
     return roundedValue;
 }
 
+// 小数第2位を切り捨て（小数第1位まで表示, ニカルジピン流速用）
+function roundDownToHalf(value) {
+    return Math.floor(value * 10) / 10;
+}
+
+function showResultArea(areaId) {
+    ['standardResultArea', 'nicardipinePeriphResultArea', 'nicardipineCentralResultArea'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = (id === areaId) ? '' : 'none';
+    });
+}
+
 function calculateDilutionVolume() {
     const weightKg = parseFloat(document.getElementById('weightKg').value);
     const selectedCode = document.getElementById('drugSelect').value;
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = '';
 
     if (!selectedCode) {
-        document.getElementById('errorMessage').textContent = "⚠️ 薬剤を選択してください。";
+        errorMessage.textContent = "⚠️ 薬剤を選択してください。";
         return;
     }
 
     const drug = DRUG_DATA.find(d => d.code === selectedCode);
-    const totalVolumeMl = parseFloat(document.querySelector('input[name="totalVolume"]:checked').value);
-
-    const drugVolumeOutput = document.getElementById('drugVolumeMl');
-    const diluentVolumeOutput = document.getElementById('diluentVolumeMl');
-    const trueDoseOutput = document.getElementById('trueDoseOutput');
-    const errorRateOutput = document.getElementById('errorRateOutput');
-    const errorMessage = document.getElementById('errorMessage');
-    const drugVolumeLabel = document.getElementById('drugVolumeLabel');
-
-    const targetDecimals = drug ? getDecimalPlaces(drug.target_dose) : 0;
-    const displayDecimals = targetDecimals + 1;
-
-    drugVolumeOutput.textContent = '-- mL';
-    diluentVolumeOutput.textContent = '-- mL';
-    trueDoseOutput.textContent = '--';
-    errorRateOutput.textContent = '-- %';
-    errorMessage.textContent = '';
-
-    const finalConcUnit = drug ? (drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL') : 'mg/mL';
-    drugVolumeLabel.textContent = `必要な溶質 (${drug ? drug.name : '未選択'}, ${drug ? drug.conc_mg_mL : '--'} ${finalConcUnit}):`;
 
     if (isNaN(weightKg) || weightKg <= 0) {
         errorMessage.textContent = "⚠️ 体重を正しく入力してください。（0kg以下は不可）";
@@ -516,6 +577,46 @@ function calculateDilutionVolume() {
         errorMessage.textContent = `⚠️ 体重は${MIN_WEIGHT} kgから${MAX_WEIGHT} kgの範囲で入力してください。`;
         return;
     }
+
+    // ニカルジピン末梢静脈路
+    if (drug.special_type === 'nicardipine_peripheral') {
+        showResultArea('nicardipinePeriphResultArea');
+        const flow01 = roundDownToHalf((0.5 * weightKg * 60) / (0.1 * 1000));
+        const flow02 = roundDownToHalf((0.5 * weightKg * 60) / (0.2 * 1000));
+        document.getElementById('nicardipinePeriphFlow01').textContent = `${flow01.toFixed(1)} mL/hr`;
+        document.getElementById('nicardipinePeriphFlow02').textContent = `${flow02.toFixed(1)} mL/hr`;
+        return;
+    }
+
+    // ニカルジピン中心静脈（2倍希釈: 0.5mg/mL）
+    if (drug.special_type === 'nicardipine_central') {
+        showResultArea('nicardipineCentralResultArea');
+        const flow = roundDownToHalf((0.5 * weightKg * 60) / (0.5 * 1000));
+        document.getElementById('nicardipineCentralFlow').textContent = `${flow.toFixed(1)} mL/hr`;
+        return;
+    }
+
+    // 標準薬剤の計算
+    showResultArea('standardResultArea');
+
+    const totalVolumeMl = parseFloat(document.querySelector('input[name="totalVolume"]:checked').value);
+
+    const drugVolumeOutput = document.getElementById('drugVolumeMl');
+    const diluentVolumeOutput = document.getElementById('diluentVolumeMl');
+    const trueDoseOutput = document.getElementById('trueDoseOutput');
+    const errorRateOutput = document.getElementById('errorRateOutput');
+    const drugVolumeLabel = document.getElementById('drugVolumeLabel');
+
+    const targetDecimals = drug ? getDecimalPlaces(drug.target_dose) : 0;
+    const displayDecimals = targetDecimals + 1;
+
+    drugVolumeOutput.textContent = '-- mL';
+    diluentVolumeOutput.textContent = '-- mL';
+    trueDoseOutput.textContent = '--';
+    errorRateOutput.textContent = '-- %';
+
+    const finalConcUnit = drug ? (drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL') : 'mg/mL';
+    drugVolumeLabel.textContent = `必要な溶質 (${drug ? drug.name : '未選択'}, ${drug ? drug.conc_mg_mL : '--'} ${finalConcUnit}):`;
 
     const conversion = UNIT_CONVERSION[drug.target_unit];
     if (!conversion) {
