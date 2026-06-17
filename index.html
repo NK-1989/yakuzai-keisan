@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小児持続重要薬剤計算（石川県立中央病院ver）</title>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px;
+}
+
+.safety-alert {
+    border: 3px solid #e53935;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #ffebee;
+    color: #b71c1c;
+    font-size: 0.85em;
+}
+
+.safety-alert p {
+    margin: 5px 0;
+    line-height: 1.4;
+}
+
+.safety-alert strong {
+    font-weight: 700;
+}
+
+h1 {
+    color: #1a237e;
+    font-size: 1.4em;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+h2 {
+    color: #455a64;
+    font-size: 1.1em;
+    border-left: 5px solid #00796b;
+    padding-left: 10px;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.input-section {
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label,
+.input-group p.input-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95em;
+}
+
+.input-group input[type="number"],
+.input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+.target-display {
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #e0f2f1;
+    border: 1px solid #b2dfdb;
+    border-radius: 6px;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.target-display strong {
+    font-size: 1.1em;
+    color: #004d40;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-top: 5px;
+}
+
+.radio-group input[type="radio"] {
+    display: none;
+}
+
+.radio-group label {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f0f0f0;
+    transition: background-color 0.2s;
+    font-size: 0.9em;
+}
+
+.radio-group input[type="radio"]:checked + label {
+    background-color: #1a237e;
+    color: white;
+    border-color: #1a237e;
+}
+
+#calculateButton {
+    width: 100%;
+    padding: 12px;
+    background-color: #4caf50;
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background-color 0.2s;
+}
+
+#calculateButton:hover {
+    background-color: #43a047;
+}
+
+.error-message {
+    color: #e53935;
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.result-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+.output-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+
+.output-group:last-child {
+    border-bottom: none;
+}
+
+.output-label {
+    font-weight: 500;
+    color: #555;
+    font-size: 0.95em;
+}
+
+.output-value {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #1a237e;
+}
+
+.output-value.main-result {
+    font-size: 1.3em;
+    color: #00796b;
+}
+
+.output-group.secondary .output-value {
+    font-size: 1.0em;
+}
+
+.reference-section {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+    padding-bottom: 10px;
+    border-radius: 4px;
+}
+
+.reference-section h2 {
+    font-size: 1.1em;
+    color: #555;
+    border-left: none;
+    padding-left: 0;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.reference-section ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 10px;
+}
+
+.reference-section li {
+    font-size: 0.8em;
+    color: #666;
+    margin-bottom: 5px;
+    padding: 0 5px;
+    text-indent: -1.5em;
+    padding-left: 1.5em;
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="safety-alert">
+            <p><strong>【重要な警告および免責事項】</strong></p>
+            <p>本アプリの計算結果はあくまで参考情報です。<strong>実際の投与に際しては、必ず医療従事者が手計算または他のシステムで再計算を行って照合してください。</strong></p>
+            <p>本アプリの製作者は、本アプリの使用によって生じた一切の損害について責任を負いません。</p>
+        </div>
+
+        <h1>小児持続重要薬剤計算</h1>
+
+        <div class="input-section">
+            <h2>患者体重</h2>
+            <div class="input-group">
+                <label for="weightKg">体重 (kg):</label>
+                <input type="number" id="weightKg" step="0.1" min="1.5" max="50.0" placeholder="例: 5.0">
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2>薬剤選択</h2>
+
+            <div class="input-group">
+                <label for="categorySelect">カテゴリ:</label>
+                <select id="categorySelect"></select>
+            </div>
+
+            <div class="input-group">
+                <label for="drugSelect">薬剤名:</label>
+                <select id="drugSelect"></select>
+            </div>
+
+            <div id="drugTargetDisplay" class="target-display">
+                目標: 1 mL/hr = 薬剤を選択してください
+            </div>
+        </div>
+
+        <div class="input-section">
+            <h2>総容量の選択</h2>
+            <div class="input-group">
+                <p class="input-label">最終容量 (mL):</p>
+                <div class="radio-group">
+                    <input type="radio" id="vol10" name="totalVolume" value="10" checked>
+                    <label for="vol10">10 mL</label>
+
+                    <input type="radio" id="vol20" name="totalVolume" value="20">
+                    <label for="vol20">20 mL</label>
+
+                    <input type="radio" id="vol30" name="totalVolume" value="30">
+                    <label for="vol30">30 mL</label>
+
+                    <input type="radio" id="vol40" name="totalVolume" value="40">
+                    <label for="vol40">40 mL</label>
+                </div>
+            </div>
+        </div>
+
+        <button id="calculateButton">計算実行</button>
+
+        <p id="errorMessage" class="error-message"></p>
+
+        <div class="result-section">
+            <h2>調剤量（小数点第1位・偶数丸め）</h2>
+
+            <div class="output-group">
+                <p class="output-label" id="drugVolumeLabel">必要な溶質:</p>
+                <p id="drugVolumeMl" class="output-value main-result">-- mL</p>
+            </div>
+
+            <div class="output-group">
+                <p class="output-label">必要な溶媒:</p>
+                <p id="diluentVolumeMl" class="output-value main-result">-- mL</p>
+            </div>
+
+            <hr>
+
+            <h2>品質確認（1 mL/hr投与時）</h2>
+
+            <div class="output-group secondary">
+                <p class="output-label">実際の投与速度:</p>
+                <p id="trueDoseOutput" class="output-value">--</p>
+            </div>
+
+            <div class="output-group secondary">
+                <p class="output-label">目標からの誤差:</p>
+                <p id="errorRateOutput" class="output-value">-- %</p>
+            </div>
+        </div>
+
+        <div class="reference-section">
+            <h2>参考文献</h2>
+            <ul>
+                <li>小児集中治療ポケットブック / 診断と治療社</li>
+                <li>小児救命救急・ICUピックアップ1 ショック / メディカルサイエンスインターナショナル</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+const MIN_WEIGHT = 1.5;
+const MAX_WEIGHT = 50.0;
+
+const DRUG_DATA = [
+    { category: '心血管作動薬', name: 'ドブタミン100mg/5mL', code: 'DobutamineH', conc_mg_mL: 20.0, target_dose: 5.0, target_unit: 'ug/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
+    { category: '心血管作動薬', name: 'ドブタミン0.3%シリンジ', code: 'DobutamineL', conc_mg_mL: 3.0, target_dose: 5.0, target_unit: 'ug/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
+    { category: '心血管作動薬', name: 'ドパミン100mg/5mL', code: 'DopamineH', conc_mg_mL: 20.0, target_dose: 5.0, target_unit: 'ug/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
+    { category: '心血管作動薬', name: 'イノバン0.3%シリンジ', code: 'DopamineL', conc_mg_mL: 3.0, target_dose: 5.0, target_unit: 'ug/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
+    { category: '心血管作動薬', name: 'ノルアドレナリン1mg/mL', code: 'Noradrenaline', conc_mg_mL: 1.0, target_dose: 0.05, target_unit: 'ug/kg/min', start_dose: 0.05, min_dose: 0.01, max_dose: 1.0 },
+    { category: '心血管作動薬', name: 'アドレナリン1mg/mL', code: 'Adrenaline', conc_mg_mL: 1.0, target_dose: 0.05, target_unit: 'ug/kg/min', start_dose: 0.05, min_dose: 0.01, max_dose: 0.1 },
+    { category: '心血管作動薬', name: 'ミルリノン10mg/10mL', code: 'Millinon', conc_mg_mL: 1.0, target_dose: 0.5, target_unit: 'ug/kg/min', start_dose: 0.5, min_dose: 0.25, max_dose: 1.0 },
+    { category: '心血管作動薬', name: 'ニカルジピン', code: 'Nicardipine', conc_mg_mL: 1.0, target_dose: 1.0, target_unit: 'ug/kg/min', start_dose: 1.0, min_dose: 0.5, max_dose: 2.0 },
+    { category: '心血管作動薬', name: 'アルプロスタジルアルファデックス(PGE1-CD)', code: 'PGE1CD', conc_mg_mL: 0.02, target_dose: 50.0, target_unit: 'ng/kg/min', start_dose: 50.0, min_dose: 10.0, max_dose: 200.0, stock_note: '1Vを生食 1mL で溶解' },
+    { category: '心血管作動薬', name: 'パルクス(Lipo-PGE1)', code: 'LipoPGE1', conc_mg_mL: 0.005, target_dose: 5.0, target_unit: 'ng/kg/min', start_dose: 5.0, min_dose: 2.0, max_dose: 10.0 },
+    { category: '心血管作動薬', name: 'ピトレシン20U', code: 'Vasopresin', conc_mg_mL: 20.0, target_dose: 0.4, target_unit: 'mU/kg/min', start_dose: 0.4, min_dose: 0.2, max_dose: 1.0 },
+    { category: '鎮静薬', name: '10kg以上：ミダゾラム', code: 'Midazolamb10', conc_mg_mL: 5.0, target_dose: 0.1, target_unit: 'mg/kg/hr', start_dose: 0.1, min_dose: 0.05, max_dose: 0.2 },
+    { category: '鎮静薬', name: '10kg未満：ミダゾラム', code: 'Midazolamu10', conc_mg_mL: 5.0, target_dose: 0.2, target_unit: 'mg/kg/hr', start_dose: 0.2, min_dose: 0.05, max_dose: 0.2 },
+    { category: '鎮痛薬', name: '10kg以上：フェンタニル', code: 'Fentanylb10', conc_mg_mL: 0.05, target_dose: 1.0, target_unit: 'ug/kg/hr', start_dose: 1.0, min_dose: 0.5, max_dose: 2.0 },
+    { category: '鎮痛薬', name: '10kg未満：フェンタニル', code: 'Fentanylu10', conc_mg_mL: 0.05, target_dose: 2.0, target_unit: 'ug/kg/hr', start_dose: 2.0, min_dose: 1.0, max_dose: 2.0 },
+    { category: '鎮痛薬', name: '10kg以上：モルヒネ', code: 'Morphineb10', conc_mg_mL: 10.0, target_dose: 20.0, target_unit: 'ug/kg/hr', start_dose: 20.0, min_dose: 10.0, max_dose: 80.0 },
+    { category: '鎮痛薬', name: '10kg未満：モルヒネ', code: 'Morphineu10', conc_mg_mL: 10.0, target_dose: 40.0, target_unit: 'ug/kg/hr', start_dose: 40.0, min_dose: 20.0, max_dose: 80.0 },
+    { category: '筋弛緩薬', name: '10kg未満：ロクロニウム', code: 'Rocuroniumu10', conc_mg_mL: 10.0, target_dose: 10.0, target_unit: 'ug/kg/min', start_dose: 10.0, min_dose: 0, max_dose: 10.0 },
+    { category: '筋弛緩薬', name: '10-30kg：ロクロニウム', code: 'Rocuronium1030', conc_mg_mL: 10.0, target_dose: 5.0, target_unit: 'ug/kg/min', start_dose: 5.0, min_dose: 0, max_dose: 10.0 },
+    { category: '筋弛緩薬', name: '30kg以上：ロクロニウム', code: 'Rocuroniumb30', conc_mg_mL: 10.0, target_dose: 3.0, target_unit: 'ug/kg/min', start_dose: 3.0, min_dose: 0, max_dose: 10.0 },
+    { category: '利尿薬', name: 'フロセミド', code: 'Furosemide', conc_mg_mL: 10.0, target_dose: 10.0, target_unit: 'mg/kg/day', start_dose: 10.0, min_dose: 5.0, max_dose: 10.0 }
+];
+
+const UNIT_CONVERSION = {
+    'ug/kg/min': { mass_op: 'MUL', mass_val: 1, time_val: 1, isMassUnit: true, output_unit: 'ug/mL' },
+    'ug/kg/hr': { mass_op: 'MUL', mass_val: 1, time_val: 60, isMassUnit: true, output_unit: 'ug/mL' },
+    'ng/kg/min': { mass_op: 'DIV', mass_val: 1000, time_val: 1, isMassUnit: true, output_unit: 'ug/mL' },
+    'mg/kg/hr': { mass_op: 'MUL', mass_val: 1000, time_val: 60, isMassUnit: true, output_unit: 'ug/mL' },
+    'mg/kg/day': { mass_op: 'MUL', mass_val: 1000, time_val: 1440, isMassUnit: true, output_unit: 'ug/mL' },
+    'U/kg/min': { mass_op: 'MUL', mass_val: 1, time_val: 1, isMassUnit: false, output_unit: 'U/mL' },
+    'mU/kg/min': { mass_op: 'DIV', mass_val: 1000, time_val: 1, isMassUnit: false, output_unit: 'U/mL' },
+    'U/kg/hr': { mass_op: 'MUL', mass_val: 1, time_val: 60, isMassUnit: false, output_unit: 'U/mL' },
+    'U/kg/h': { mass_op: 'MUL', mass_val: 1, time_val: 60, isMassUnit: false, output_unit: 'U/mL' },
+};
+
+const MINUTES_PER_HOUR = 60;
+const MICROGRAMS_PER_MILLIGRAM = 1000;
+
+function getDecimalPlaces(value) {
+    const text = value.toString();
+    const decimalIndex = text.indexOf('.');
+    return decimalIndex === -1 ? 0 : text.length - decimalIndex - 1;
+}
+
+function setEventListeners() {
+    try {
+        document.getElementById('calculateButton').addEventListener('click', calculateDilutionVolume);
+        document.getElementById('categorySelect').addEventListener('change', populateDrugSelect);
+        document.getElementById('drugSelect').addEventListener('change', updateFixedDoseDisplay);
+    } catch (e) {
+        console.error("Critical DOM Initialization Error: An ID was not found.", e);
+    }
+}
+
+function initializeApp() {
+    const categorySelect = document.getElementById('categorySelect');
+    if (!categorySelect) return;
+
+    const categories = [...new Set(DRUG_DATA.map(d => d.category.trim()))];
+    categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        categorySelect.appendChild(option);
+    });
+
+    if (categories.length > 0) {
+        categorySelect.value = categories[0];
+    }
+    populateDrugSelect();
+}
+
+function populateDrugSelect() {
+    const categorySelect = document.getElementById('categorySelect');
+    const drugSelect = document.getElementById('drugSelect');
+    if (!categorySelect || !drugSelect) return;
+
+    const selectedCategory = categorySelect.value.trim();
+    drugSelect.innerHTML = '';
+
+    const filteredDrugs = DRUG_DATA.filter(d => d.category.trim() === selectedCategory);
+
+    filteredDrugs.forEach(drug => {
+        const option = document.createElement('option');
+        option.value = drug.code;
+        const concUnit = drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL';
+        option.textContent = `${drug.name} (${drug.conc_mg_mL} ${concUnit})`;
+        drugSelect.appendChild(option);
+    });
+
+    updateFixedDoseDisplay();
+}
+
+function updateFixedDoseDisplay() {
+    const drugSelect = document.getElementById('drugSelect');
+    const displayElement = document.getElementById('drugTargetDisplay');
+    if (!drugSelect || !displayElement) return;
+
+    const selectedCode = drugSelect.value;
+    if (!selectedCode) {
+        displayElement.textContent = '目標: 1 mL/hr = 薬剤を選択してください';
+        return;
+    }
+
+    const drug = DRUG_DATA.find(d => d.code === selectedCode);
+
+    if (drug) {
+        let doseRange = '';
+        if (drug.min_dose !== undefined && drug.max_dose !== undefined) {
+            doseRange = ` (${drug.min_dose}〜${drug.max_dose} ${drug.target_unit})`;
+        }
+
+        let startDoseDisplay = '';
+        if (drug.start_dose !== undefined) {
+            startDoseDisplay = `<br><span style="color: #00796b; font-weight: normal;">開始量: ${drug.start_dose} ${drug.target_unit}</span>`;
+        }
+
+        let displayHtml = `目標: 1 mL/hr = **${drug.target_dose} ${drug.target_unit}** (${drug.name})${doseRange}${startDoseDisplay}`;
+
+        if (drug.stock_note) {
+            displayHtml += `<br><span style="color: #e53935; font-size: 0.9em;">(原液作成指示: ${drug.stock_note})</span>`;
+        }
+
+        displayElement.innerHTML = displayHtml;
+    } else {
+        displayElement.textContent = '目標: 1 mL/hr = 薬剤を選択してください';
+    }
+}
+
+function roundToEvenFirstDecimal(value) {
+    const roundedValue = Math.round(value * 10) / 10;
+    const firstDecimal = Math.round(roundedValue * 10) % 10;
+
+    if (firstDecimal % 2 !== 0) {
+        return (Math.ceil((value + 0.05) * 10) / 10);
+    }
+    return roundedValue;
+}
+
+function calculateDilutionVolume() {
+    const weightKg = parseFloat(document.getElementById('weightKg').value);
+    const selectedCode = document.getElementById('drugSelect').value;
+
+    if (!selectedCode) {
+        document.getElementById('errorMessage').textContent = "⚠️ 薬剤を選択してください。";
+        return;
+    }
+
+    const drug = DRUG_DATA.find(d => d.code === selectedCode);
+    const totalVolumeMl = parseFloat(document.querySelector('input[name="totalVolume"]:checked').value);
+
+    const drugVolumeOutput = document.getElementById('drugVolumeMl');
+    const diluentVolumeOutput = document.getElementById('diluentVolumeMl');
+    const trueDoseOutput = document.getElementById('trueDoseOutput');
+    const errorRateOutput = document.getElementById('errorRateOutput');
+    const errorMessage = document.getElementById('errorMessage');
+    const drugVolumeLabel = document.getElementById('drugVolumeLabel');
+
+    const targetDecimals = drug ? getDecimalPlaces(drug.target_dose) : 0;
+    const displayDecimals = targetDecimals + 1;
+
+    drugVolumeOutput.textContent = '-- mL';
+    diluentVolumeOutput.textContent = '-- mL';
+    trueDoseOutput.textContent = '--';
+    errorRateOutput.textContent = '-- %';
+    errorMessage.textContent = '';
+
+    const finalConcUnit = drug ? (drug.target_unit.includes('U') || drug.target_unit.includes('mU') ? 'U/mL' : 'mg/mL') : 'mg/mL';
+    drugVolumeLabel.textContent = `必要な溶質 (${drug ? drug.name : '未選択'}, ${drug ? drug.conc_mg_mL : '--'} ${finalConcUnit}):`;
+
+    if (isNaN(weightKg) || weightKg <= 0) {
+        errorMessage.textContent = "⚠️ 体重を正しく入力してください。（0kg以下は不可）";
+        return;
+    }
+
+    if (weightKg < MIN_WEIGHT || weightKg > MAX_WEIGHT) {
+        errorMessage.textContent = `⚠️ 体重は${MIN_WEIGHT} kgから${MAX_WEIGHT} kgの範囲で入力してください。`;
+        return;
+    }
+
+    const conversion = UNIT_CONVERSION[drug.target_unit];
+    if (!conversion) {
+        errorMessage.textContent = "⚠️ 選択された薬剤の投与単位が未定義です。開発者に確認してください。";
+        return;
+    }
+
+    let baseDoseRate;
+    if (conversion.mass_op === 'MUL') {
+        baseDoseRate = (drug.target_dose * conversion.mass_val) / conversion.time_val;
+    } else {
+        baseDoseRate = (drug.target_dose / conversion.mass_val) / conversion.time_val;
+    }
+
+    const targetConcentrationFinalUnitMl = (baseDoseRate * weightKg * MINUTES_PER_HOUR);
+
+    let calculatedDrugVolumeMl;
+
+    if (conversion.isMassUnit) {
+        const requiredDrugAmountUg = targetConcentrationFinalUnitMl * totalVolumeMl;
+        const requiredDrugAmountMg = requiredDrugAmountUg / MICROGRAMS_PER_MILLIGRAM;
+        calculatedDrugVolumeMl = requiredDrugAmountMg / drug.conc_mg_mL;
+    } else {
+        const requiredDrugAmountUnit = targetConcentrationFinalUnitMl * totalVolumeMl;
+        calculatedDrugVolumeMl = requiredDrugAmountUnit / drug.conc_mg_mL;
+    }
+
+    const drugVolumeMl = roundToEvenFirstDecimal(calculatedDrugVolumeMl);
+    const diluentVolumeMl = totalVolumeMl - drugVolumeMl;
+
+    if (drugVolumeMl > totalVolumeMl) {
+        drugVolumeOutput.textContent = 'エラー';
+        diluentVolumeOutput.textContent = 'エラー';
+
+        let requiredVolume = calculatedDrugVolumeMl.toFixed(1);
+        errorMessage.textContent = `⚠️ 総容量 (${totalVolumeMl} mL) 超過！ 目標濃度を達成するには約 ${requiredVolume} mLの溶質が必要です。総容量を増やすか、設定を見直してください。`;
+        return;
+    }
+
+    let actualDrugAmount;
+    if (conversion.isMassUnit) {
+        actualDrugAmount = drugVolumeMl * drug.conc_mg_mL * MICROGRAMS_PER_MILLIGRAM;
+    } else {
+        actualDrugAmount = drugVolumeMl * drug.conc_mg_mL;
+    }
+
+    const actualConcentrationFinalUnitMl = actualDrugAmount / totalVolumeMl;
+
+    const trueDoseNumerator = actualConcentrationFinalUnitMl;
+    const trueDoseDenominator = weightKg * MINUTES_PER_HOUR;
+    const trueBaseRate = trueDoseNumerator / trueDoseDenominator;
+
+    let trueDoseFinalUnit;
+    if (conversion.mass_op === 'MUL') {
+        trueDoseFinalUnit = trueBaseRate * conversion.time_val / conversion.mass_val;
+    } else {
+        trueDoseFinalUnit = trueBaseRate * conversion.time_val * conversion.mass_val;
+    }
+
+    const errorPercentage = ((trueDoseFinalUnit - drug.target_dose) / drug.target_dose) * 100;
+
+    drugVolumeOutput.textContent = `${drugVolumeMl.toFixed(1)} mL`;
+    diluentVolumeOutput.textContent = `${diluentVolumeMl.toFixed(1)} mL`;
+
+    trueDoseOutput.innerHTML = `${trueDoseFinalUnit.toFixed(displayDecimals)} ${drug.target_unit}`;
+    errorRateOutput.innerHTML = `${errorPercentage.toFixed(2)} %`;
+
+    const errorColor = (Math.abs(errorPercentage) > 5) ? 'red' : 'green';
+    errorRateOutput.style.color = errorColor;
+
+    if (!conversion.isMassUnit) {
+        errorMessage.textContent = `計算は製剤濃度がU/mLであることを前提に行われています。`;
+    } else {
+        errorMessage.textContent = '';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setEventListeners();
+    initializeApp();
+});
+    </script>
+</body>
+</html>
